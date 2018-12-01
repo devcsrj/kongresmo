@@ -66,6 +66,57 @@ void main() {
           ]));
     });
 
+    test('.fetchOne(SBN-1354)', () async {
+      server.enqueueResponse(new MockResponse()
+        ..httpCode = 200
+        ..body = new File(
+                "test/resources/senate.gov.ph/17th-congress-bills-sbn1354.htm")
+            .readAsStringSync());
+      server.enqueueResponse(new MockResponse()
+        ..httpCode = 200
+        ..body = new File(
+                "test/resources/senate.gov.ph/17th-congress-bills-sbn1354-all.htm")
+            .readAsStringSync());
+
+      var api = new SenateLegislationApi(server.url);
+      var legislation = await api.fetchOne(17, "SBN-1354");
+
+      expect(legislation.number, "SBN-1354");
+      expect(legislation.title, "MENTAL HEALTH ACT OF 2017");
+      expect(legislation.longTitle,
+          startsWith("AN ACT ESTABLISHING A NATIONAL MENTAL HEALTH "));
+      expect(legislation.scope, "National");
+      expect(legislation.status,
+          "Approved by the President of the Philippines (6/20/2018)");
+      expect(legislation.subjects, ["Mental Health"]);
+      expect(legislation.committees,
+          ["Health and Demography", "Local Government", "Finance"]);
+      expect(legislation.logs.length, 28);
+
+      // assert request
+      var rr = server.takeRequest();
+      expect(rr.method, "POST");
+      expect(rr.uri.pathSegments, ["lis", "bill_res.aspx"]);
+      expect(rr.uri.queryParameters["congress"], "17");
+      expect(rr.uri.queryParameters["q"], "SBN-1354");
+      expect(rr.headers['content-type'],
+          contains("application/x-www-form-urlencoded"));
+      expect(
+          rr.body,
+          "__EVENTTARGET=lbAll&__EVENTARGUMENT=&__VIEWSTATE=%2FwEP"
+          "DwUJNjIyOTUxNjI5D2QWAgIBD2QWAgIBD2QWBgIBDw8WBh4IQ3NzQ2xhc3MFE2xpc19"
+          "ib2xkX2xpbmtidXR0b24eB0VuYWJsZWRoHgRfIVNCAgJkZAINDw8WBB4EVGV4dAUMUm"
+          "VwdWJsaWMgQWN0HgdWaXNpYmxlaGRkAg8PDxYCHwRoZGRkxhmc7v44F58V%2BiYdxpn"
+          "AjIv4vUw%3D&__VIEWSTATEGENERATOR=AB8B2AD5&__EVENTVALIDATION=%2FwEWB"
+          "QLCqsfmAgLJ%2FIvGBwLH35XtCwL4k9H6DAKLqrzFDYkzj4DRfMavPDDhSGjIauHBRm"
+          "f%2F");
+      rr = server.takeRequest();
+      expect(rr.method, "GET");
+      expect(rr.uri.pathSegments, ["lis", "bill_res.aspx"]);
+      expect(rr.uri.queryParameters["congress"], "17");
+      expect(rr.uri.queryParameters["q"], "SBN-1354");
+    });
+
     tearDown(() async {
       await server.shutdown();
     });
