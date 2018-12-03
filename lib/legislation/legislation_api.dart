@@ -5,9 +5,9 @@ import 'package:kongresmo_project/legislation/legislation.dart';
 import 'package:quiver/check.dart';
 
 abstract class LegislationApi {
-  Stream<Legislation> fetchAll(int congress);
+  Stream<Legislation> fetchBills(int congress);
 
-  Future<LegislationDetails> fetchOne(int congress, String number);
+  Future<LegislationDetails> fetchBill(int congress, String number);
 }
 
 class SenateLegislationApi implements LegislationApi {
@@ -20,7 +20,7 @@ class SenateLegislationApi implements LegislationApi {
   }
 
   @override
-  Stream<Legislation> fetchAll(int congress) async* {
+  Stream<Legislation> fetchBills(int congress) async* {
     Document document = await _fetchDocumentByParam(congress, 1);
     while (document != null) {
       var entries = document.querySelectorAll("#form1 > div.alight > p");
@@ -55,7 +55,7 @@ class SenateLegislationApi implements LegislationApi {
   }
 
   @override
-  Future<LegislationDetails> fetchOne(int congress, String number) async {
+  Future<LegislationDetails> fetchBill(int congress, String number) async {
     var uri =
         baseUri.resolve("/lis/bill_res.aspx?congress=$congress&q=$number");
     // ASP.NET pages are a nightmare to crawl, as they add additional

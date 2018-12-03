@@ -13,7 +13,7 @@ void main() {
       await server.start();
     });
 
-    test('.fetchAll(17)', () {
+    test('.fetchBills(17)', () {
       server.enqueueResponse(new MockResponse()
         ..httpCode = 200
         ..body = new File(
@@ -34,7 +34,7 @@ void main() {
             .readAsStringSync());
 
       var api = new SenateLegislationApi(server.url);
-      var legislation = api.fetchAll(17);
+      var legislation = api.fetchBills(17);
 
       expect(
           legislation,
@@ -69,7 +69,7 @@ void main() {
           ]));
     });
 
-    test('.fetchOne(SBN-1354)', () async {
+    test('.fetchBill(17, SBN-1354)', () async {
       server.enqueueResponse(new MockResponse()
         ..httpCode = 200
         ..body = new File(
@@ -82,7 +82,7 @@ void main() {
             .readAsStringSync());
 
       var api = new SenateLegislationApi(server.url);
-      var legislation = await api.fetchOne(17, "SBN-1354");
+      var legislation = await api.fetchBill(17, "SBN-1354");
 
       expect(legislation.congress, 17);
       expect(legislation.number, "SBN-1354");
