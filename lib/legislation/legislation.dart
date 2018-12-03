@@ -1,27 +1,33 @@
 class Legislation {
+  int congress;
   String number;
   String title;
 
-  Legislation(this.number, this.title);
+  Legislation(this.congress, this.number, this.title);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Legislation &&
-          runtimeType == other.runtimeType &&
-          number == other.number &&
-          title == other.title;
+          other is Legislation &&
+              runtimeType == other.runtimeType &&
+              congress == other.congress &&
+              number == other.number &&
+              title == other.title;
 
   @override
-  int get hashCode => number.hashCode ^ title.hashCode;
+  int get hashCode =>
+      congress.hashCode ^
+      number.hashCode ^
+      title.hashCode;
 
   @override
   String toString() {
-    return 'Legislation{number: $number, title: $title}';
+    return 'Legislation{congress: $congress, number: $number, title: $title}';
   }
 }
 
 class LegislationDetails {
+  int congress;
   String number;
   String title;
   String longTitle;

@@ -32,7 +32,7 @@ class SenateLegislationApi implements LegislationApi {
         var colon = span.text.indexOf(':');
         var number = span.text.substring(0, colon);
         var title = span.text.substring(colon + 1).trimLeft();
-        yield new Legislation(number, title);
+        yield new Legislation(congress, number, title);
       }
       var element =
           document.querySelector("#pnl_NavTop > div > div > a:last-child");
@@ -81,6 +81,7 @@ class SenateLegislationApi implements LegislationApi {
 
     // at this point, we now have the actual document that we want
     var details = new LegislationDetails();
+    details.congress = congress;
     details.number = number;
     details.title = page.querySelector("#content > div.lis_doctitle > p").text;
 

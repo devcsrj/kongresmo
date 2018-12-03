@@ -39,29 +39,32 @@ void main() {
       expect(
           legislation,
           emitsInOrder([
-            new Legislation("SBN-16", "The New Central Bank Act"),
-            new Legislation("SBN-15", "Philippine Identification System Act"),
-            new Legislation("SBN-14",
+            new Legislation(17, "SBN-16", "The New Central Bank Act"),
+            new Legislation(
+                17, "SBN-15", "Philippine Identification System Act"),
+            new Legislation(17, "SBN-14",
                 "Amending the Revised Penal Code (Adjusting the Amount Involved on Which a Penalty Is Based)"),
             new Legislation(
-                "SBN-13", "Salary Standardization Law of 2016 (Ssl 2016)"),
+                17, "SBN-13", "Salary Standardization Law of 2016 (Ssl 2016)"),
             new Legislation(
-                "SBN-12", "Philippine Conditional Cash Transfer (CCT) Act"),
-            new Legislation("SBN-11", "Transportation Crisis Act of 2016"),
-            new Legislation("SBN-10", "National Internal Revenue Code of 1997"),
-            new Legislation("SBN-9", "Philippine Mental Health Act of 2016"),
+                17, "SBN-12", "Philippine Conditional Cash Transfer (CCT) Act"),
+            new Legislation(17, "SBN-11", "Transportation Crisis Act of 2016"),
+            new Legislation(
+                17, "SBN-10", "National Internal Revenue Code of 1997"),
+            new Legislation(
+                17, "SBN-9", "Philippine Mental Health Act of 2016"),
             // next page
-            new Legislation("SBN-8",
+            new Legislation(17, "SBN-8",
                 "Drug Rehabilitation Treatment for Philhealth Beneficiaries"),
-            new Legislation("SBN-7", "Sim Card Registration Act of 2016"),
-            new Legislation("SBN-6",
+            new Legislation(17, "SBN-7", "Sim Card Registration Act of 2016"),
+            new Legislation(17, "SBN-6",
                 "R.A.No. 53, to Include Print, Broadcast and Electronic Mass Media in the Exemption"),
-            new Legislation("SBN-5", "Dangerous Drug Court (DDC)"),
-            new Legislation("SBN-4", "Death Penalty Act of 2016"),
+            new Legislation(17, "SBN-5", "Dangerous Drug Court (DDC)"),
+            new Legislation(17, "SBN-4", "Death Penalty Act of 2016"),
             new Legislation(
-                "SBN-3", "Presidential Anti-Drug Authority (Prada) Act"),
-            new Legislation("SBN-2", "14th Month Pay Law"),
-            new Legislation("SBN-1", "Anti-Drug Penal Institution"),
+                17, "SBN-3", "Presidential Anti-Drug Authority (Prada) Act"),
+            new Legislation(17, "SBN-2", "14th Month Pay Law"),
+            new Legislation(17, "SBN-1", "Anti-Drug Penal Institution"),
             emitsDone,
           ]));
     });
@@ -81,6 +84,7 @@ void main() {
       var api = new SenateLegislationApi(server.url);
       var legislation = await api.fetchOne(17, "SBN-1354");
 
+      expect(legislation.congress, 17);
       expect(legislation.number, "SBN-1354");
       expect(legislation.title, "MENTAL HEALTH ACT OF 2017");
       expect(legislation.longTitle,
