@@ -15,7 +15,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  mock_web_server: ^3.0.0
+  mock_web_server: ^4.0.0
   quiver: '>=2.0.0 <3.0.0'
   html: any
   http: ^0.12.0

@@ -99,6 +99,12 @@ void main() {
 
       // assert request
       var rr = server.takeRequest();
+      expect(rr.method, "GET");
+      expect(rr.uri.pathSegments, ["lis", "bill_res.aspx"]);
+      expect(rr.uri.queryParameters["congress"], "17");
+      expect(rr.uri.queryParameters["q"], "SBN-1354");
+
+      rr = server.takeRequest();
       expect(rr.method, "POST");
       expect(rr.uri.pathSegments, ["lis", "bill_res.aspx"]);
       expect(rr.uri.queryParameters["congress"], "17");
@@ -114,11 +120,6 @@ void main() {
           "AjIv4vUw%3D&__VIEWSTATEGENERATOR=AB8B2AD5&__EVENTVALIDATION=%2FwEWB"
           "QLCqsfmAgLJ%2FIvGBwLH35XtCwL4k9H6DAKLqrzFDYkzj4DRfMavPDDhSGjIauHBRm"
           "f%2F");
-      rr = server.takeRequest();
-      expect(rr.method, "GET");
-      expect(rr.uri.pathSegments, ["lis", "bill_res.aspx"]);
-      expect(rr.uri.queryParameters["congress"], "17");
-      expect(rr.uri.queryParameters["q"], "SBN-1354");
     });
 
     test('.fetchSenators(17) - most recent', () async {
