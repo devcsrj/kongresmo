@@ -18,6 +18,7 @@ A **bill**, is law in the making. The process, as outlined by the 1987 Constitut
 ![](./docs/bill-part1.jpg)
 ![](./docs/bill-part2.jpg)
 ![](./docs/bill-part3.jpg)
+![](./docs/bill-part4.jpg)
 
 ## Why
 
