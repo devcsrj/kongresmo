@@ -121,6 +121,86 @@ void main() {
       expect(rr.uri.queryParameters["q"], "SBN-1354");
     });
 
+    test('.fetchSenators(17) - most recent', () async {
+      server.enqueueResponse(new MockResponse()
+        ..httpCode = 200
+        ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
+            .readAsStringSync());
+
+      var api = new SenateLegislationApi(server.url);
+      var senators = await api.fetchSenators(17);
+
+      expect(senators, [
+        new Senator('Vicente C. Sotto III'),
+        new Senator('Aquilino \'Koko\' Pimentel III'),
+        new Senator('Ralph G. Recto'),
+        new Senator('Juan Miguel "Migz" F. Zubiri'),
+        new Senator('Franklin M. Drilon'),
+        new Senator('Juan Edgardo "Sonny" M. Angara'),
+        new Senator('Paolo Benigno "Bam" Aquino IV'),
+        new Senator('Maria Lourdes Nancy S. Binay'),
+        new Senator('Alan Peter Compañero S. Cayetano'),
+        new Senator('Leila de Lima'),
+        new Senator('Joseph Victor "JV" G. Ejercito'),
+        new Senator('Francis "Chiz" G. Escudero'),
+        new Senator('Sherwin "Win" T. Gatchalian'),
+        new Senator('Richard J. Gordon'),
+        new Senator('Gregorio B. Honasan II'),
+        new Senator('Risa Hontiveros'),
+        new Senator('Panfilo "Ping" M. Lacson'),
+        new Senator('Loren B. Legarda'),
+        new Senator('Emmanuel "Manny" D. Pacquiao'),
+        new Senator('Francis "Kiko" Pangilinan'),
+        new Senator('Grace L. Poe'),
+        new Senator('Antonio "Sonny" F. Trillanes IV'),
+        new Senator('Emmanuel Joel J. Villanueva'),
+        new Senator('Cynthia A. Villar')
+      ]);
+      expect(senators.length, 24);
+
+      var rr = server.takeRequest();
+      expect(rr.method, "GET");
+      expect(rr.uri.pathSegments, ["senators", "senlist.asp"]);
+    });
+
+    test('.fetchSenators(16) - non recent', () async {
+      server.enqueueResponse(new MockResponse()
+        ..httpCode = 200
+        ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
+            .readAsStringSync());
+
+      var api = new SenateLegislationApi(server.url);
+      var senators = await api.fetchSenators(16);
+
+      expect(senators, [
+        new Senator('Franklin M. Drilon'),
+        new Senator('Ralph G. Recto'),
+        new Senator('Alan Peter Compañero S. Cayetano'),
+        new Senator('Juan Ponce Enrile'),
+        new Senator('Juan Edgardo "Sonny" M. Angara'),
+        new Senator('Paolo Benigno "Bam" Aquino IV'),
+        new Senator('Maria Lourdes Nancy S. Binay'),
+        new Senator('Pia S. Cayetano'),
+        new Senator('Miriam Defensor Santiago'),
+        new Senator('Joseph Victor G. Ejercito'),
+        new Senator('Francis "Chiz" G. Escudero'),
+        new Senator('Jinggoy Ejercito Estrada'),
+        new Senator('Teofisto "TG" Guingona III'),
+        new Senator('Gregorio B. Honasan II'),
+        new Senator('Manuel "Lito" M. Lapid'),
+        new Senator('Loren B. Legarda'),
+        new Senator('Ferdinand "Bongbong" R. Marcos, Jr.'),
+        new Senator('Sergio R. Osmeña III'),
+        new Senator('Aquilino \'Koko\' Pimentel III'),
+        new Senator('Grace L. Poe'),
+        new Senator('Ramon "Bong" Revilla, Jr.'),
+        new Senator('Vicente C. Sotto III'),
+        new Senator('Antonio "Sonny" F. Trillanes IV'),
+        new Senator('Cynthia A. Villar'),
+      ]);
+      expect(senators.length, 24);
+    });
+
     tearDown(() async {
       await server.shutdown();
     });

@@ -1,3 +1,4 @@
+import 'package:html/dom.dart';
 import 'package:kongresmo_project/legislation/utils.dart';
 import 'package:test_api/test_api.dart';
 
@@ -36,5 +37,29 @@ void main() {
     } on AssertionError catch (ex) {
       expect(ex.message, "Oh wow, we're now on to 100 Congress? Congrats PH!");
     }
+  });
+
+  test("can get element's own text", () {
+    var span = Element.tag('span');
+    span.text = "World";
+
+    var p = Element.tag('p');
+    p.text = "Hello";
+    p.append(span);
+
+    expect(p.text, "HelloWorld");
+    var actual = Utils.innerText(p);
+    expect(p.text, "HelloWorld"); // should retain original element
+    expect(actual, "Hello");
+  });
+
+  test("can get element's own text even with new lines", () {
+    var p = Element.tag('p');
+    p.text = "Hello\nWorld";
+
+    expect(p.text, "Hello\nWorld");
+    var actual = Utils.innerText(p);
+    expect(p.text, "Hello\nWorld"); // should retain original element
+    expect(actual, "HelloWorld");
   });
 }

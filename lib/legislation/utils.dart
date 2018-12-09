@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:html/dom.dart';
+
 class Utils {
   Utils() {
     throw new AssertionError("Intentionally unimplemented");
@@ -60,5 +62,13 @@ class Utils {
 
     String secondWord = singleDigitOrdinals[ones - 1];
     return firstWord + secondWord;
+  }
+
+  /// Returns the 'own text' (without the text of children) of the element
+  static String innerText(Element element) {
+    var copy = element.clone(true);
+    var children = copy.children;
+    for (var e in children) e.remove();
+    return copy.text.replaceAll(new RegExp('(\r\n|\r|\n)'), '');
   }
 }

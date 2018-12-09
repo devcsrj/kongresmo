@@ -8,17 +8,14 @@ class Legislation {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Legislation &&
-              runtimeType == other.runtimeType &&
-              congress == other.congress &&
-              number == other.number &&
-              title == other.title;
+      other is Legislation &&
+          runtimeType == other.runtimeType &&
+          congress == other.congress &&
+          number == other.number &&
+          title == other.title;
 
   @override
-  int get hashCode =>
-      congress.hashCode ^
-      number.hashCode ^
-      title.hashCode;
+  int get hashCode => congress.hashCode ^ number.hashCode ^ title.hashCode;
 
   @override
   String toString() {
@@ -81,5 +78,26 @@ class Resource {
   @override
   String toString() {
     return 'Document{name: $name, link: $link}';
+  }
+}
+
+class Senator {
+  String name;
+
+  Senator(this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Senator &&
+          runtimeType == other.runtimeType &&
+          name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  String toString() {
+    return 'Senator{name: $name}';
   }
 }

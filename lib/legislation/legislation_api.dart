@@ -2,12 +2,15 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 import 'package:kongresmo_project/legislation/legislation.dart';
+import 'package:kongresmo_project/legislation/utils.dart';
 import 'package:quiver/check.dart';
 
 abstract class LegislationApi {
   Stream<Legislation> fetchBills(int congress);
 
   Future<LegislationDetails> fetchBill(int congress, String number);
+
+  Future<Set<Senator>> fetchSenators(int congress);
 }
 
 class SenateLegislationApi implements LegislationApi {
@@ -60,9 +63,7 @@ class SenateLegislationApi implements LegislationApi {
         baseUri.resolve("/lis/bill_res.aspx?congress=$congress&q=$number");
     // ASP.NET pages are a nightmare to crawl, as they add additional
     // client state details in the pages. So first we fetch the "landing page"
-    var page = await httpClient.get(uri).then((response) {
-      return response.statusCode == 200 ? parse(response.body) : null;
-    });
+    var page = await _fetchDocumentByUri(uri);
     if (page == null) return null; // could not find the bill to begin with
 
     page = await httpClient.post(uri, headers: {
@@ -132,5 +133,87 @@ class SenateLegislationApi implements LegislationApi {
     }
 
     return details;
+  }
+
+  @override
+  Future<Set<Senator>> fetchSenators(int congress) async {
+    var uri = baseUri.resolve("/senators/senlist.asp");
+    var document = await _fetchDocumentByUri(uri);
+    if (document == null) return new Set();
+
+    // Unfortunately, the values of a[name] are not always correct
+    // (e.g., the 17th Congress section has an a[name] of 'sixteenth_congress'
+    // So we instead we take the text, according the following format:
+    //    <a name="sixteenth_congress"></a>"SEVENTEENTH CONGRESS"
+    var elements = document.querySelectorAll("a[name\$='_congress']");
+    if (elements == null) return new Set();
+
+    var found;
+    var needed = Utils.ordinalOf(congress).toUpperCase();
+    for (Element a in elements) {
+      var sectionName = Utils.innerText(a.parent).trim();
+      sectionName = sectionName.substring(0, sectionName.indexOf(" CONGRESS"));
+      if (needed == sectionName) {
+        found = a;
+        break;
+      }
+    }
+
+    Set<Senator> senators = new Set();
+    if (found == null) return new Set();
+
+    Element rootTd = found.parent.parent;
+    // we first need the senators with floor positions
+    var tds = rootTd.querySelectorAll(".senatorlist");
+    for (Element td in tds) {
+      var small = td.querySelector('small');
+      if (small != null) {
+        if (Utils.innerText(small).contains("Secretary")) {
+          // not a senator
+          continue;
+        }
+      }
+      var name = Utils.innerText(td).trim();
+      if (name.isEmpty) {
+        // for any other section before the latest Congress,
+        // the names are actually contained in an <a> tag
+        var a = td.querySelector('a');
+        if (a != null) {
+          name = Utils.innerText(a).trim();
+        }
+      }
+      if (name.isEmpty) continue;
+      senators.add(new Senator(name));
+    }
+
+    // then we pick up the rest of the senators
+    rootTd = rootTd.parent.nextElementSibling;
+    // <td class='.senatorlist'>
+    //  <p>Name</p>
+    //  ..
+    tds = rootTd.querySelectorAll('.senatorlist');
+
+    // for non-recent senators, they are wrapped in a <a>
+    var linebreak = new RegExp('(\r\n|\r|\n)');
+    for (Element td in tds) {
+      for (Element child in td.children) {
+        var name = child.text;
+        // because dart doesn't provide 'innerText', we need to
+        // re-join new lines from the original text
+        name =
+            name.split(linebreak).map((String t) => t.trim()).join(' ').trim();
+
+        while (name.endsWith('*')) {
+          // some have an '*' for footnote index
+          name = name.substring(0, name.length - 1);
+        }
+        name = name.trim();
+        if (name.isEmpty) continue;
+        if (name.startsWith("*")) continue; // a footnote
+
+        senators.add(new Senator(name));
+      }
+    }
+    return senators;
   }
 }
