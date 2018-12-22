@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:kongresmo_project/legislation/legislation.dart';
-import 'package:kongresmo_project/legislation/legislation_api.dart';
+import 'package:kongresmo_project/legislation/senate.dart';
 import 'package:mock_web_server/mock_web_server.dart';
 import 'package:test_api/test_api.dart';
 
@@ -33,38 +32,38 @@ void main() {
                 "test/resources/senate.gov.ph/17th-congress-bills-page264.htm")
             .readAsStringSync());
 
-      var api = new SenateLegislationApi(server.url);
+      var api = new HttpSenateApi(server.url);
       var legislation = api.fetchBills(17);
 
       expect(
           legislation,
           emitsInOrder([
-            new Legislation(17, "SBN-16", "The New Central Bank Act"),
-            new Legislation(
+            new SenateBill(17, "SBN-16", "The New Central Bank Act"),
+            new SenateBill(
                 17, "SBN-15", "Philippine Identification System Act"),
-            new Legislation(17, "SBN-14",
+            new SenateBill(17, "SBN-14",
                 "Amending the Revised Penal Code (Adjusting the Amount Involved on Which a Penalty Is Based)"),
-            new Legislation(
+            new SenateBill(
                 17, "SBN-13", "Salary Standardization Law of 2016 (Ssl 2016)"),
-            new Legislation(
+            new SenateBill(
                 17, "SBN-12", "Philippine Conditional Cash Transfer (CCT) Act"),
-            new Legislation(17, "SBN-11", "Transportation Crisis Act of 2016"),
-            new Legislation(
+            new SenateBill(17, "SBN-11", "Transportation Crisis Act of 2016"),
+            new SenateBill(
                 17, "SBN-10", "National Internal Revenue Code of 1997"),
-            new Legislation(
+            new SenateBill(
                 17, "SBN-9", "Philippine Mental Health Act of 2016"),
             // next page
-            new Legislation(17, "SBN-8",
+            new SenateBill(17, "SBN-8",
                 "Drug Rehabilitation Treatment for Philhealth Beneficiaries"),
-            new Legislation(17, "SBN-7", "Sim Card Registration Act of 2016"),
-            new Legislation(17, "SBN-6",
+            new SenateBill(17, "SBN-7", "Sim Card Registration Act of 2016"),
+            new SenateBill(17, "SBN-6",
                 "R.A.No. 53, to Include Print, Broadcast and Electronic Mass Media in the Exemption"),
-            new Legislation(17, "SBN-5", "Dangerous Drug Court (DDC)"),
-            new Legislation(17, "SBN-4", "Death Penalty Act of 2016"),
-            new Legislation(
+            new SenateBill(17, "SBN-5", "Dangerous Drug Court (DDC)"),
+            new SenateBill(17, "SBN-4", "Death Penalty Act of 2016"),
+            new SenateBill(
                 17, "SBN-3", "Presidential Anti-Drug Authority (Prada) Act"),
-            new Legislation(17, "SBN-2", "14th Month Pay Law"),
-            new Legislation(17, "SBN-1", "Anti-Drug Penal Institution"),
+            new SenateBill(17, "SBN-2", "14th Month Pay Law"),
+            new SenateBill(17, "SBN-1", "Anti-Drug Penal Institution"),
             emitsDone,
           ]));
     });
@@ -81,7 +80,7 @@ void main() {
                 "test/resources/senate.gov.ph/17th-congress-bills-sbn1354-all.htm")
             .readAsStringSync());
 
-      var api = new SenateLegislationApi(server.url);
+      var api = new HttpSenateApi(server.url);
       var legislation = await api.fetchBill(17, "SBN-1354");
 
       expect(legislation.congress, 17);
@@ -128,7 +127,7 @@ void main() {
         ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
             .readAsStringSync());
 
-      var api = new SenateLegislationApi(server.url);
+      var api = new HttpSenateApi(server.url);
       var senators = await api.fetchSenators(17);
 
       expect(senators, [
@@ -170,7 +169,7 @@ void main() {
         ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
             .readAsStringSync());
 
-      var api = new SenateLegislationApi(server.url);
+      var api = new HttpSenateApi(server.url);
       var senators = await api.fetchSenators(16);
 
       expect(senators, [

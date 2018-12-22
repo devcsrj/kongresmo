@@ -1,29 +1,132 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
-import 'package:kongresmo_project/legislation/legislation.dart';
 import 'package:kongresmo_project/legislation/utils.dart';
 import 'package:quiver/check.dart';
 
-abstract class LegislationApi {
-  Stream<Legislation> fetchBills(int congress);
+class SenateBill {
+  int congress;
+  String number;
+  String title;
 
-  Future<LegislationDetails> fetchBill(int congress, String number);
+  SenateBill(this.congress, this.number, this.title);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SenateBill &&
+          runtimeType == other.runtimeType &&
+          congress == other.congress &&
+          number == other.number &&
+          title == other.title;
+
+  @override
+  int get hashCode => congress.hashCode ^ number.hashCode ^ title.hashCode;
+
+  @override
+  String toString() {
+    return 'Legislation{congress: $congress, number: $number, title: $title}';
+  }
+}
+
+class SenateBillDetails {
+  int congress;
+  String number;
+  String title;
+  String longTitle;
+  String scope;
+  String status;
+  List<String> subjects = [];
+  List<String> committees = [];
+  List<Log> logs = [];
+}
+
+class Log {
+  DateTime date;
+  String description;
+
+  Log(this.date, this.description);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Log &&
+          runtimeType == other.runtimeType &&
+          date == other.date &&
+          description == other.description;
+
+  @override
+  int get hashCode => date.hashCode ^ description.hashCode;
+
+  @override
+  String toString() {
+    return 'Log{date: $date, description: $description}';
+  }
+}
+
+class Resource {
+  String name;
+  Uri link;
+
+  Resource(this.name, this.link);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Resource &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          link == other.link;
+
+  @override
+  int get hashCode => name.hashCode ^ link.hashCode;
+
+  @override
+  String toString() {
+    return 'Document{name: $name, link: $link}';
+  }
+}
+
+class Senator {
+  String name;
+
+  Senator(this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Senator &&
+          runtimeType == other.runtimeType &&
+          name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  String toString() {
+    return 'Senator{name: $name}';
+  }
+}
+
+abstract class SenateApi {
+  Stream<SenateBill> fetchBills(int congress);
+
+  Future<SenateBillDetails> fetchBill(int congress, String number);
 
   Future<Set<Senator>> fetchSenators(int congress);
 }
 
-class SenateLegislationApi implements LegislationApi {
+class HttpSenateApi implements SenateApi {
   Uri baseUri;
   http.Client httpClient;
 
-  SenateLegislationApi(String baseUrl) {
+  HttpSenateApi(String baseUrl) {
     this.baseUri = Uri.parse(checkNotNull(baseUrl));
     this.httpClient = new http.Client();
   }
 
   @override
-  Stream<Legislation> fetchBills(int congress) async* {
+  Stream<SenateBill> fetchBills(int congress) async* {
     Document document = await _fetchDocumentByParam(congress, 1);
     while (document != null) {
       var entries = document.querySelectorAll("#form1 > div.alight > p");
@@ -35,7 +138,7 @@ class SenateLegislationApi implements LegislationApi {
         var colon = span.text.indexOf(':');
         var number = span.text.substring(0, colon);
         var title = span.text.substring(colon + 1).trimLeft();
-        yield new Legislation(congress, number, title);
+        yield new SenateBill(congress, number, title);
       }
       var element =
           document.querySelector("#pnl_NavTop > div > div > a:last-child");
@@ -58,7 +161,7 @@ class SenateLegislationApi implements LegislationApi {
   }
 
   @override
-  Future<LegislationDetails> fetchBill(int congress, String number) async {
+  Future<SenateBillDetails> fetchBill(int congress, String number) async {
     var uri =
         baseUri.resolve("/lis/bill_res.aspx?congress=$congress&q=$number");
     // ASP.NET pages are a nightmare to crawl, as they add additional
@@ -81,7 +184,7 @@ class SenateLegislationApi implements LegislationApi {
     });
 
     // at this point, we now have the actual document that we want
-    var details = new LegislationDetails();
+    var details = new SenateBillDetails();
     details.congress = congress;
     details.number = number;
     details.title = page.querySelector("#content > div.lis_doctitle > p").text;
