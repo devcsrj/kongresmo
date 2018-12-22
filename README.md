@@ -17,6 +17,8 @@ A **bill**, is law in the making. The process, as outlined by the 1987 Constitut
 
 ![](./docs/bill.jpg)
 
+_Infographic taken from [primer.com.ph](http://primer.com.ph/tips-guides/2016/10/02/introduction-to-the-philippine-legislative-process/)_
+
 ## Why
 
 I've always been adamant in pushing the Philippines forward through technology. This project, is a step 
