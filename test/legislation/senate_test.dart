@@ -32,7 +32,7 @@ void main() {
                 "test/resources/senate.gov.ph/17th-congress-bills-page264.htm")
             .readAsStringSync());
 
-      var api = new HttpSenateApi(server.url);
+      var api = new HttpSenateBillApi(server.url);
       var legislation = api.fetchBills(17);
 
       expect(
@@ -80,7 +80,7 @@ void main() {
                 "test/resources/senate.gov.ph/17th-congress-bills-sbn1354-all.htm")
             .readAsStringSync());
 
-      var api = new HttpSenateApi(server.url);
+      var api = new HttpSenateBillApi(server.url);
       var legislation = await api.fetchBill(17, "SBN-1354");
 
       expect(legislation.congress, 17);
@@ -127,7 +127,7 @@ void main() {
         ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
             .readAsStringSync());
 
-      var api = new HttpSenateApi(server.url);
+      var api = new HttpSenateBillApi(server.url);
       var senators = await api.fetchSenators(17);
 
       expect(senators, [
@@ -169,7 +169,7 @@ void main() {
         ..body = new File("test/resources/senate.gov.ph/senator-list.htm")
             .readAsStringSync());
 
-      var api = new HttpSenateApi(server.url);
+      var api = new HttpSenateBillApi(server.url);
       var senators = await api.fetchSenators(16);
 
       expect(senators, [

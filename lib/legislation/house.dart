@@ -1,48 +1,40 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+import 'package:kongresmo_project/legislation/bill.dart';
 import 'package:quiver/check.dart';
 
-class HouseOfRepresentativesBill {
-  int congress;
-  String number;
-  String title;
-
-  HouseOfRepresentativesBill(this.congress, this.number, this.title);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HouseOfRepresentativesBill &&
-          runtimeType == other.runtimeType &&
-          congress == other.congress &&
-          number == other.number &&
-          title == other.title;
-
-  @override
-  int get hashCode => congress.hashCode ^ number.hashCode ^ title.hashCode;
-
-  @override
-  String toString() {
-    return 'HouseOfRepresentativesBill{congress: $congress, number: $number, title: $title}';
-  }
+/// Bill filed by a congressperson.
+///
+/// When filed with the Secretary General, the bill is filed as "H.B".
+class HouseBill extends Bill {
+  HouseBill(int congress, String number, String title)
+      : super(congress, number, title);
 }
 
-abstract class HouseOfRepresentativesApi {
-  Stream<HouseOfRepresentativesBill> fetchBills(int congress);
+/// The House of Representatives serves as the lower body of the Philippine
+/// Congress.
+///
+/// It is composed by at most 250 congressperson. There are two types of
+/// congressperson: the district and the sectoral representatives. The district
+/// congressmen represent a particular geographical district of the country.
+/// All provinces in the country are composed of at least one congressional
+/// district.
+abstract class HouseBillApi extends BillApi {
+  Stream<HouseBill> fetchBills(int congress);
 }
 
-class HttpHouseOfRepresentativesApi implements HouseOfRepresentativesApi {
+class HttpHouseBillApi implements HouseBillApi {
   Uri baseUri;
   http.Client httpClient;
 
-  HttpHouseOfRepresentativesApi(String baseUrl) {
+  HttpHouseBillApi(String baseUrl) {
     this.baseUri = Uri.parse(checkNotNull(baseUrl));
     this.httpClient = new http.Client();
   }
 
   @override
-  Stream<HouseOfRepresentativesBill> fetchBills(int congress) async* {
+  Stream<HouseBill> fetchBills(int congress) async* {
     var document = await _fetchDocumentByParam(congress);
     if (document == null) yield null;
 
@@ -64,7 +56,7 @@ class HttpHouseOfRepresentativesApi implements HouseOfRepresentativesApi {
 
       String title = p.text;
       String number = panel.text;
-      yield new HouseOfRepresentativesBill(congress, number, title);
+      yield new HouseBill(congress, number, title);
     }
   }
 

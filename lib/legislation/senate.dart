@@ -1,32 +1,16 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+import 'package:kongresmo_project/legislation/bill.dart';
 import 'package:kongresmo_project/legislation/utils.dart';
 import 'package:quiver/check.dart';
 
-class SenateBill {
-  int congress;
-  String number;
-  String title;
-
-  SenateBill(this.congress, this.number, this.title);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SenateBill &&
-          runtimeType == other.runtimeType &&
-          congress == other.congress &&
-          number == other.number &&
-          title == other.title;
-
-  @override
-  int get hashCode => congress.hashCode ^ number.hashCode ^ title.hashCode;
-
-  @override
-  String toString() {
-    return 'Legislation{congress: $congress, number: $number, title: $title}';
-  }
+/// Bill filed by a senator.
+///
+/// When filed with the Secretary General, the bill is filed as "S.B".
+class SenateBill extends Bill {
+  SenateBill(int congress, String number, String title)
+      : super(congress, number, title);
 }
 
 class SenateBillDetails {
@@ -64,29 +48,6 @@ class Log {
   }
 }
 
-class Resource {
-  String name;
-  Uri link;
-
-  Resource(this.name, this.link);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Resource &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          link == other.link;
-
-  @override
-  int get hashCode => name.hashCode ^ link.hashCode;
-
-  @override
-  String toString() {
-    return 'Document{name: $name, link: $link}';
-  }
-}
-
 class Senator {
   String name;
 
@@ -108,7 +69,12 @@ class Senator {
   }
 }
 
-abstract class SenateApi {
+/// The Senate serves as the upper body of the Philippine Congress.
+///
+/// It is composed of 24 senators, half of which are elected every three years.
+/// The senators are elected by the whole electorate and do not represent any
+/// geographical district.
+abstract class SenateBillApi extends BillApi {
   Stream<SenateBill> fetchBills(int congress);
 
   Future<SenateBillDetails> fetchBill(int congress, String number);
@@ -116,11 +82,11 @@ abstract class SenateApi {
   Future<Set<Senator>> fetchSenators(int congress);
 }
 
-class HttpSenateApi implements SenateApi {
+class HttpSenateBillApi implements SenateBillApi {
   Uri baseUri;
   http.Client httpClient;
 
-  HttpSenateApi(String baseUrl) {
+  HttpSenateBillApi(String baseUrl) {
     this.baseUri = Uri.parse(checkNotNull(baseUrl));
     this.httpClient = new http.Client();
   }
